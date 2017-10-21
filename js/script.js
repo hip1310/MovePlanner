@@ -13,7 +13,20 @@ function loadData() {
 
     // load streetview
 
-    // YOUR CODE GOES HERE!
+    // Get the street name from the textbox
+    var street = $('#street').val();
+
+    // Get the name of the city from the textbox
+    var city = $('#city').val();
+
+    var location = street + ', ' + city;
+    $greeting.text('So, you want to live at ' + location + '?');
+
+    var imgUrl = 'http://maps.googleapis.com/maps/api/streetview?size=600x300&location='
+                + location;
+
+    // Set the street view image on background
+    $body.append('<img class="bgimg" src="' + imgUrl + '">');
 
     return false;
 };
