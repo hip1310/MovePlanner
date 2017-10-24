@@ -63,6 +63,59 @@ function loadData() {
       }
     );
 
+    // Get the wikipedia links for the specified location by user
+
+    // JSONP (JSON with Padding) is a method commonly used to bypass the cross-domain policies in web browsers.
+    // You are not allowed to make AJAX requests to a web page perceived to be on a different server by the browser.
+    // JSON and JSONP behave differently on the client and the server.
+    // JSONP requests are not dispatched using the XMLHTTPRequest and the associated browser methods.
+    // Instead a <script> tag is created, whose source is set to the target URL.
+    // This script tag is then added to the DOM (normally inside the <head> element).
+
+    // Workaround for error handling with JSONP
+    // As with the JSONP we can't use .error() jquery method because of the
+    // limitation of the underltying implementation of JSONP
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text("Failed to get Wikipedia resources");
+    }, 8000);
+
+    $.ajax({
+        url: "https://en.wikipedia.org/w/api.php",
+
+        // The name of the callback parameter
+        jsonp: "callback",
+
+        // Tell jQuery we're expecting JSONP
+        dataType: "jsonp",
+
+        // Specify the query parameters
+        data: {
+            "action": "opensearch",
+            "search": city,
+            "format": "json"
+        },
+
+        // Work with the response
+        success: function( response ) {
+            var wikiTextList = response[1];
+            var wikiLinksList = response[3];
+
+            if(wikiTextList !== undefined){
+                for(var i=0; i<wikiLinksList.length; i++){
+                    var wikiLinkText = wikiTextList[i];
+                    var wikiLink = wikiLinksList[i];
+                    $wikiElem.append('<li><a href="' + wikiLink + '">'
+                                     + wikiLinkText + '</a></li>')
+                }
+            }
+
+            // If we reach here, it means we successfully got the wikipedia
+            // links. Clear the timeout we set before to prevent displaying
+            // error message.
+            clearTimeout(wikiRequestTimeout);
+        }
+    });
+
     return false;
 };
 
